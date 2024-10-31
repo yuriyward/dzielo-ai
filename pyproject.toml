@@ -30,5 +30,8 @@ select = [
     "N",  # PEP8 naming convetions
 ]
 
+[tool.ruff]
+line-length = 140
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"

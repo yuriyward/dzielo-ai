@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Launch dzielo-ai",
+            "program": "${workspaceFolder}/dzielo_ai/create.py",
+            "console": "integratedTerminal",
+            "args": [
+                "${input:month}",
+                "${input:year}"
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "month",
+            "description": "Enter the month"
+        },
+        {
+            "type": "promptString",
+            "id": "year",
+            "description": "Enter the year"
+        }
+    ]
+}
