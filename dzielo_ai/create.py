@@ -6,6 +6,7 @@ import pathlib
 import re
 import subprocess
 import time
+import zipfile
 from typing import List, Tuple
 
 import colorlog
@@ -303,6 +304,20 @@ def load_commit_messages(repo_path: pathlib.Path, first_day: datetime.date, last
         raise
 
 
+def zip_output_files(zip_filename: pathlib.Path, files: list) -> None:
+    """
+    Zips the specified files into a single zip archive.
+
+    Args:
+        zip_filename (pathlib.Path): The path to the zip file to create.
+        files (list): A list of file paths to include in the zip archive.
+    """
+    with zipfile.ZipFile(zip_filename, "w") as zipf:
+        for file in files:
+            zipf.write(file, arcname=file.name)
+    logging.info(f"Output files zipped into: {zip_filename}")
+
+
 def process_commits(
     repo_path: pathlib.Path,
     first_day: datetime.date,
@@ -328,9 +343,13 @@ def process_commits(
     output_dir.mkdir(parents=True, exist_ok=True)
     logging.info(f"Output directory is set to: {output_dir.resolve()}")
 
+    # Extract author name from email
+    author_name = author.split("@")[0].replace(".", "_")
+
     # File names for output
-    commit_changes_filename = output_dir / f"{first_day.year}.{first_day.month:02d}_zmiany.txt"
-    rewritten_filename = output_dir / f"{first_day.year}.{first_day.month:02d}_opis_zmian.txt"
+    commit_changes_filename = output_dir / f"{first_day.year}_{first_day.month:02d}_zmiany.txt"
+    rewritten_filename = output_dir / f"{first_day.year}_{first_day.month:02d}_opis_zmian.txt"
+    zip_filename = output_dir / f"dzielo_{author_name}_{first_day.year}_{first_day.month:02d}.zip"
 
     # Command to get detailed commit changes
     commit_changes_command = [
@@ -362,6 +381,9 @@ def process_commits(
 
     # Save rewritten commit messages
     write_to_file(str(rewritten_filename), rewritten_messages + "\n")
+
+    # Zip the output files
+    zip_output_files(zip_filename, [commit_changes_filename, rewritten_filename])
 
 
 def main() -> None:
